@@ -188,3 +188,58 @@ export const updatePaymentStatus = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
+
+
+export const getTaxiStats = async (req, res) => {
+    try {
+        const totalBookings = await TaxiBooking.countDocuments();
+        const pendingBookings = await TaxiBooking.countDocuments({ status: 'pending' });
+        const confirmedBookings = await TaxiBooking.countDocuments({ status: 'confirmed' });
+        const inProgressBookings = await TaxiBooking.countDocuments({ status: 'in-progress' });
+        const completedBookings = await TaxiBooking.countDocuments({ status: 'completed' });
+        const cancelledBookings = await TaxiBooking.countDocuments({ status: 'cancelled' });
+
+        const totalDrivers = await Driver.countDocuments();
+        const availableDrivers = await Driver.countDocuments({ status: 'available' });
+        const busyDrivers = await Driver.countDocuments({ status: 'busy' });
+
+        // Calculate today's revenue
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const todayBookings = await TaxiBooking.find({
+            status: 'completed',
+            paymentStatus: 'paid',
+            updatedAt: { $gte: today }
+        });
+
+        const todayRevenue = todayBookings.reduce((sum, booking) => sum + booking.totalFare, 0);
+
+        // Calculate total revenue
+        const allCompletedBookings = await TaxiBooking.find({
+            status: 'completed',
+            paymentStatus: 'paid'
+        });
+
+        const totalRevenue = allCompletedBookings.reduce((sum, booking) => sum + booking.totalFare, 0);
+
+        res.json({
+            success: true,
+            data: {
+                totalBookings,
+                pendingBookings,
+                confirmedBookings,
+                inProgressBookings,
+                completedBookings,
+                cancelledBookings,
+                totalDrivers,
+                availableDrivers,
+                busyDrivers,
+                todayRevenue,
+                totalRevenue
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}

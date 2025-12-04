@@ -1,17 +1,19 @@
 import express from "express";
-import { assignDriver, createBooking, createDriver, getAllBookings, getAllDrivers, getAvailableDrivers, getBookingById, updateBookingStatus, updatePaymentStatus } from "../controllers/taxiController.js";
+import { assignDriver, createBooking, createDriver, getAllBookings, getAllDrivers, getAvailableDrivers, getBookingById, getTaxiStats, updateBookingStatus, updatePaymentStatus } from "../controllers/taxiController.js";
 
-const transportRouter = express.Router();
+const taxiRouter = express.Router();
 
-transportRouter.post('/bookings', createBooking);
-transportRouter.get('/bookings', getAllBookings);
-transportRouter.get('/bookings/:id', getBookingById);
-transportRouter.put('/bookings/:id/status', updateBookingStatus);
-transportRouter.put('/bookings/:id/assign-driver', assignDriver);
-transportRouter.put('/bookings/:id/payment', updatePaymentStatus);
+taxiRouter.post('/bookings', createBooking);
+taxiRouter.get('/bookings', getAllBookings);
+taxiRouter.get('/bookings/:id', getBookingById);
+taxiRouter.put('/bookings/:id/status', updateBookingStatus);
+taxiRouter.put('/bookings/:id/assign-driver', assignDriver);
+taxiRouter.put('/bookings/:id/payment', updatePaymentStatus);
 
-transportRouter.get('/drivers', getAllDrivers);
-transportRouter.get('/drivers/available', getAvailableDrivers);
-transportRouter.post('/drivers', createDriver);
+taxiRouter.get('/drivers', getAllDrivers);
+taxiRouter.get('/drivers/available', getAvailableDrivers);
+taxiRouter.post('/drivers', createDriver);
 
-export default transportRouter
+taxiRouter.get('/stats', getTaxiStats)
+
+export default taxiRouter
